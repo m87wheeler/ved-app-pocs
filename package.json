@@ -1,0 +1,11 @@
+{
+  "name": "@ved-poc-monorepo/source",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "libs/*",
+    "packages/*",
+    "apps/*"
+  ]
+}
