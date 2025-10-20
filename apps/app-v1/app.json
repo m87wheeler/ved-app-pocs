@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "app-v1",
-    "slug": "app-v1",
+    "slug": "ved-poc-v1",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "68d640eb-4329-44d9-8538-84e00e54f943"
+      }
+    },
+    "owner": "m87wheeler"
   }
 }
