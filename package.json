@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "license": "MIT",
+  "scripts": {
+    "app:android:v1": "yarn workspace @ved-poc-monorepo/app-v1 start",
+    "app:ios:v1": "yarn workspace @ved-poc-monorepo/app-v1 start"
+  },
   "workspaces": [
     "libs/*",
     "packages/*",
