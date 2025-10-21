@@ -1,11 +1,27 @@
-import { Stack } from 'expo-router'
-import { Text, View } from 'react-native'
+import { ViewContainer } from "@/libs/components/view-container";
+import { useAuthStore } from "@/libs/stores/auth-store";
+import { Stack } from "expo-router";
+import { Button, StyleSheet, View } from "react-native";
 
 export default function ProtectedLayout() {
+  const setIsAuthenticated = useAuthStore((state) => state.setIsAuthenticated);
+
+  const handleSignOut = () => {
+    setIsAuthenticated(false);
+  };
+
   return (
-    <View style={{ flex: 1 }}>
-      <Text style={{ padding: 8 }}>Protected Routes</Text>
+    <ViewContainer>
+      <View style={$styles.header}>
+        <Button title="Sign Out" onPress={handleSignOut} />
+      </View>
       <Stack screenOptions={{ headerShown: false }} />
-    </View>
-  )
+    </ViewContainer>
+  );
 }
+
+const $styles = StyleSheet.create({
+  header: {
+    padding: 8,
+  },
+});

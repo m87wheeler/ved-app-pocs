@@ -1,5 +1,5 @@
-import { Text } from "react-native";
+import { MembershipView } from "@/libs/views/membership-view";
 
 export default function MembershipPage() {
-  return <Text>MM+ Dashboard</Text>;
+  return <MembershipView />;
 }
