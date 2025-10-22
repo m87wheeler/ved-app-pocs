@@ -1,10 +1,10 @@
 import { RedisClient } from "@/libs/redis";
-import { DBMember } from "@ved-poc-monorepo/shared";
+import type { DBMember } from "@ved-poc-monorepo/shared";
 
 export const GET = async (req: Request): Promise<Response> => {
   try {
-    const body = await req.json();
-    const { memberId } = body;
+    const { searchParams } = new URL(req.url);
+    const memberId = searchParams.get("memberId");
 
     if (!memberId) {
       return new Response("Bad Request: memberId is required", { status: 400 });
