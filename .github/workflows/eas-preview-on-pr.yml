@@ -39,4 +39,8 @@ jobs:
         uses: expo/expo-github-action/preview@v8
         with:
           working-directory: apps/app-v1
-          command: eas update --auto --branch pr-${{ github.event.pull_request.number }}
+          command: >
+            eas update
+            --channel preview
+            --message "PR branch: ${{ github.event.pull_request.head.ref }} preview"
+            --non-interactive

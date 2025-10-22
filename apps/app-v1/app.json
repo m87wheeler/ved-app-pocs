@@ -55,6 +55,12 @@
         "projectId": "68d640eb-4329-44d9-8538-84e00e54f943"
       }
     },
-    "owner": "m87wheeler"
+    "owner": "m87wheeler",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/68d640eb-4329-44d9-8538-84e00e54f943"
+    }
   }
 }
