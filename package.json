@@ -4,6 +4,7 @@
   "private": true,
   "license": "MIT",
   "scripts": {
+    "web:dev:v1": "yarn workspace @ved-poc-monorepo/web-v1 dev",
     "app:android:v1": "yarn workspace @ved-poc-monorepo/app-v1 start",
     "app:ios:v1": "yarn workspace @ved-poc-monorepo/app-v1 start"
   },
