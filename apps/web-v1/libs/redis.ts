@@ -2,6 +2,7 @@ import { createClient, type RedisClientType } from "redis";
 
 interface IRedisClient<T> {
   connect(): Promise<void>;
+  disconnect(): Promise<void>;
   get(item: string): Promise<T | null>;
   set(item: string, value: T): Promise<boolean>;
 }
@@ -13,6 +14,13 @@ export class RedisClient<T> implements IRedisClient<T> {
     if (!this.instance) {
       this.instance = createClient();
       await this.instance.connect();
+    }
+  }
+
+  public async disconnect() {
+    if (this.instance) {
+      this.instance.destroy();
+      this.instance = null;
     }
   }
 
