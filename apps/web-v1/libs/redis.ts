@@ -9,10 +9,19 @@ interface IRedisClient<T> {
 
 export class RedisClient<T> implements IRedisClient<T> {
   private instance: RedisClientType | null = null;
+  private url: string;
+
+  constructor(url: string) {
+    this.url = url;
+  }
 
   public async connect() {
+    if (!this.url) {
+      throw new Error("Redis URL is not provided");
+    }
+
     if (!this.instance) {
-      this.instance = createClient();
+      this.instance = createClient({ url: this.url });
       await this.instance.connect();
     }
   }

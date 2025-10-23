@@ -10,7 +10,7 @@ export const GET = async (req: Request): Promise<Response> => {
       return new Response("Bad Request: memberId is required", { status: 400 });
     }
 
-    const redis = new RedisClient<DBMember>();
+    const redis = new RedisClient<DBMember>(process.env.REDIS_URL || "");
     await redis.connect();
 
     const member = await redis.get(memberId);
