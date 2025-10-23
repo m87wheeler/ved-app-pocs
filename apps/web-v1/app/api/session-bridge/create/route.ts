@@ -13,7 +13,7 @@ export const POST = async (req: Request): Promise<Response> => {
 
     const sessionBridgeKey = uuidv4();
 
-    const redis = new RedisClient<DBSessionBridge>();
+    const redis = new RedisClient<DBSessionBridge>(process.env.REDIS_URL || "");
     await redis.connect();
 
     const newSessionBridge: DBSessionBridge = {

@@ -17,7 +17,7 @@ export const POST = async (req: Request): Promise<Response> => {
       return new Response("Invalid session data", { status: 400 });
     }
 
-    const redis = new RedisClient<DBSessionBridge>();
+    const redis = new RedisClient<DBSessionBridge>(process.env.REDIS_URL || "");
     await redis.connect();
 
     const sessionBridge = await redis.get(key);

@@ -13,7 +13,7 @@ export const POST = async (req: Request): Promise<Response> => {
       return new Response("Email and password are required", { status: 400 });
     }
 
-    const redis = new RedisClient<DBUser>();
+    const redis = new RedisClient<DBUser>(process.env.REDIS_URL || "");
     await redis.connect();
 
     const user = await redis.get(email);
