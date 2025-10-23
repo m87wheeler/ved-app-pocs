@@ -32,7 +32,7 @@ export const POST = async (req: Request): Promise<Response> => {
       return new Response("Failed to create session bridge", { status: 500 });
     }
 
-    return new Response("Session bridge created", { status: 201 });
+    return Response.json(JSON.stringify(newSessionBridge), { status: 201 });
   } catch (error) {
     console.error("Error during session bridge creation:", error);
     return new Response("Internal Server Error", { status: 500 });
