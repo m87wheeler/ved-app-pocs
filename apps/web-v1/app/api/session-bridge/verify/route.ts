@@ -1,4 +1,5 @@
 import { RedisClient } from "@/libs/redis";
+import { RedisKeys } from "@/libs/redis/types";
 import { DBSessionBridge } from "@ved-poc-monorepo/shared";
 
 export const POST = async (req: Request): Promise<Response> => {
@@ -17,7 +18,10 @@ export const POST = async (req: Request): Promise<Response> => {
       return new Response("Invalid session data", { status: 400 });
     }
 
-    const redis = new RedisClient<DBSessionBridge>(process.env.REDIS_URL || "");
+    const redis = new RedisClient<DBSessionBridge>(
+      process.env.REDIS_URL || "",
+      RedisKeys.SESSION_BRIDGE_PREFIX
+    );
     await redis.connect();
 
     const sessionBridge = await redis.get(key);

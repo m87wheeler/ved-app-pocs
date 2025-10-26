@@ -1,4 +1,5 @@
 import { RedisClient } from "@/libs/redis";
+import { RedisKeys } from "@/libs/redis/types";
 import type { DBSessionBridge } from "@ved-poc-monorepo/shared";
 import { v4 as uuidv4 } from "uuid";
 
@@ -13,7 +14,10 @@ export const POST = async (req: Request): Promise<Response> => {
 
     const sessionBridgeKey = uuidv4();
 
-    const redis = new RedisClient<DBSessionBridge>(process.env.REDIS_URL || "");
+    const redis = new RedisClient<DBSessionBridge>(
+      process.env.REDIS_URL || "",
+      RedisKeys.SESSION_BRIDGE_PREFIX
+    );
     await redis.connect();
 
     const newSessionBridge: DBSessionBridge = {

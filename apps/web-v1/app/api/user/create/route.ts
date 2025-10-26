@@ -1,4 +1,5 @@
 import { RedisClient } from "@/libs/redis";
+import { RedisKeys } from "@/libs/redis/types";
 import type { DBUser } from "@ved-poc-monorepo/shared";
 
 export const POST = async (req: Request): Promise<Response> => {
@@ -24,7 +25,10 @@ export const POST = async (req: Request): Promise<Response> => {
       updatedAt: Date.now(),
     };
 
-    const redis = new RedisClient<DBUser>(process.env.REDIS_URL || "");
+    const redis = new RedisClient<DBUser>(
+      process.env.REDIS_URL || "",
+      RedisKeys.USER_PREFIX
+    );
     await redis.connect();
 
     const existingUser = await redis.get(email);

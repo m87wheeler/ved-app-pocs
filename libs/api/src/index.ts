@@ -16,6 +16,7 @@ export class ApiService implements IApiService {
   public member: MemberApiService;
 
   constructor(origin: string) {
+    console.log("API Service initialized with origin:", origin);
     this.origin = origin;
     this.auth = new AuthApiService(origin);
     this.sessionBridge = new SessionBridgeApiService(origin);

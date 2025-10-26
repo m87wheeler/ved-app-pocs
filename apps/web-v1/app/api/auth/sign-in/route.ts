@@ -1,6 +1,7 @@
 import type { DBUser } from "@ved-poc-monorepo/shared";
 import { RedisClient } from "@/libs/redis";
 import { cookies } from "next/headers";
+import { RedisKeys } from "@/libs/redis/types";
 
 export const POST = async (req: Request): Promise<Response> => {
   try {
@@ -13,7 +14,10 @@ export const POST = async (req: Request): Promise<Response> => {
       return new Response("Email and password are required", { status: 400 });
     }
 
-    const redis = new RedisClient<DBUser>(process.env.REDIS_URL || "");
+    const redis = new RedisClient<DBUser>(
+      process.env.REDIS_URL || "",
+      RedisKeys.USER_PREFIX
+    );
     await redis.connect();
 
     const user = await redis.get(email);

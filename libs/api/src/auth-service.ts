@@ -1,6 +1,9 @@
 interface IAuthApiService {
-  signIn(email: string, password: string): Promise<boolean>;
-  signOut(): Promise<boolean>;
+  signIn(
+    email: string,
+    password: string
+  ): Promise<{ success: boolean; error?: string }>;
+  signOut(): Promise<{ success: boolean; error?: string }>;
 }
 
 export class AuthApiService implements IAuthApiService {
@@ -10,7 +13,13 @@ export class AuthApiService implements IAuthApiService {
     this.origin = origin;
   }
 
-  public async signIn(email: string, password: string): Promise<boolean> {
+  public async signIn(
+    email: string,
+    password: string
+  ): Promise<{
+    success: boolean;
+    error?: string;
+  }> {
     try {
       const res = await fetch(`${this.origin}/api/auth/sign-in`, {
         method: "POST",
@@ -24,14 +33,16 @@ export class AuthApiService implements IAuthApiService {
         throw new Error(`Sign-in failed with status: ${res.status}`);
       }
 
-      return true;
+      return { success: true };
     } catch (error) {
-      console.error("Error during sign-in:", error);
-      return false;
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Error during sign-in:", errorMessage);
+      return { success: false, error: errorMessage };
     }
   }
 
-  public async signOut(): Promise<boolean> {
+  public async signOut(): Promise<{ success: boolean; error?: string }> {
     try {
       const res = await fetch(`${this.origin}/api/auth/sign-out`, {
         method: "POST",
@@ -41,10 +52,12 @@ export class AuthApiService implements IAuthApiService {
         throw new Error(`Sign-out failed with status: ${res.status}`);
       }
 
-      return true;
+      return { success: true };
     } catch (error) {
-      console.error("Error during sign-out:", error);
-      return false;
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      console.error("Error during sign-out:", errorMessage);
+      return { success: false, error: errorMessage };
     }
   }
 }

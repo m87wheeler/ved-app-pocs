@@ -1,16 +1,30 @@
 import { RedisClient } from "@/libs/redis";
-import type { DBMember } from "@ved-poc-monorepo/shared";
+import { RedisKeys } from "@/libs/redis/types";
+import type { DBMember, MemberDTO } from "@ved-poc-monorepo/shared";
+import { cookies } from "next/headers";
 
 export const GET = async (req: Request): Promise<Response> => {
   try {
-    const { searchParams } = new URL(req.url);
-    const memberId = searchParams.get("memberId");
-
-    if (!memberId) {
-      return new Response("Bad Request: memberId is required", { status: 400 });
+    const cookieStore = await cookies();
+    const sessionCookie = cookieStore.get("session");
+    if (!sessionCookie) {
+      return new Response("Unauthorized: No session cookie", { status: 401 });
     }
 
-    const redis = new RedisClient<DBMember>(process.env.REDIS_URL || "");
+    const session = JSON.parse(sessionCookie.value);
+    if (!session || !session.userId) {
+      return new Response("Unauthorized: Invalid session", { status: 401 });
+    }
+
+    const memberId = session.userId;
+    if (!memberId) {
+      return new Response("Member ID not found in session", { status: 400 });
+    }
+
+    const redis = new RedisClient<DBMember>(
+      process.env.REDIS_URL || "",
+      RedisKeys.MEMBER_PREFIX
+    );
     await redis.connect();
 
     const member = await redis.get(memberId);
@@ -22,6 +36,48 @@ export const GET = async (req: Request): Promise<Response> => {
     return Response.json(member, { status: 200 });
   } catch (error) {
     console.error("Error retrieving member:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
+};
+
+export const POST = async (req: Request): Promise<Response> => {
+  try {
+    const body = (await req.json()) as MemberDTO;
+
+    const email = body.email;
+    const level = body.level;
+    const promotions = body.promotions || [];
+
+    if (!email || !level) {
+      return new Response("Invalid member data", { status: 400 });
+    }
+
+    const memberId = email; // Using email as the unique identifier
+
+    const memberData: DBMember = {
+      id: memberId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      level: body.level,
+      memberSince: body.memberSince,
+      promotions: promotions,
+    };
+
+    const redis = new RedisClient<DBMember>(
+      process.env.REDIS_URL || "",
+      RedisKeys.MEMBER_PREFIX
+    );
+    await redis.connect();
+
+    await redis.set(memberId, memberData);
+    await redis.disconnect();
+
+    return new Response("Member data saved successfully", { status: 200 });
+  } catch (error) {
+    console.error("Error saving member data:", error);
     return new Response("Internal Server Error", { status: 500 });
   }
 };
