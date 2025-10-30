@@ -10,7 +10,12 @@ export const POST = async (req: Request): Promise<Response> => {
     const body = await req.json();
     const { email, password } = body;
 
-    if (!email || !password) {
+    const normalizedEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : "";
+    const normalizedPassword =
+      typeof password === "string" ? password.trim() : "";
+
+    if (!normalizedEmail || !normalizedPassword) {
       return new Response("Email and password are required", { status: 400 });
     }
 
@@ -20,9 +25,9 @@ export const POST = async (req: Request): Promise<Response> => {
     );
     await redis.connect();
 
-    const user = await redis.get(email);
+    const user = await redis.get(normalizedEmail);
     await redis.disconnect();
-    if (!user || user.password !== password) {
+    if (!user || user.password !== normalizedPassword) {
       return new Response("Invalid email or password", { status: 401 });
     }
 

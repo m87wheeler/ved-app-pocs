@@ -3,7 +3,7 @@ import { RedisKeys } from "@/libs/redis/types";
 import type { DBMember, MemberDTO } from "@ved-poc-monorepo/shared";
 import { cookies } from "next/headers";
 
-export const GET = async (req: Request): Promise<Response> => {
+export const GET = async (_: Request): Promise<Response> => {
   try {
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get("session");
@@ -12,11 +12,11 @@ export const GET = async (req: Request): Promise<Response> => {
     }
 
     const session = JSON.parse(sessionCookie.value);
-    if (!session || !session.userId) {
+    if (!session || !session.email) {
       return new Response("Unauthorized: Invalid session", { status: 401 });
     }
 
-    const memberId = session.userId;
+    const memberId = session.email;
     if (!memberId) {
       return new Response("Member ID not found in session", { status: 400 });
     }
@@ -63,7 +63,14 @@ export const POST = async (req: Request): Promise<Response> => {
       email: body.email,
       level: body.level,
       memberSince: body.memberSince,
-      promotions: promotions,
+      promotions: Array.isArray(promotions)
+        ? promotions.map((promo) => ({
+            ...promo,
+            id: promo.code,
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+          }))
+        : [],
     };
 
     const redis = new RedisClient<DBMember>(

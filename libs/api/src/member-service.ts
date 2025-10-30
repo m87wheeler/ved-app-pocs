@@ -1,7 +1,7 @@
 import type { DBMember } from "@ved-poc-monorepo/shared";
 
 interface IMemberApiService {
-  get(memberId: string): Promise<DBMember | null>;
+  get(): Promise<DBMember | null>;
 }
 
 export class MemberApiService implements IMemberApiService {
@@ -11,11 +11,9 @@ export class MemberApiService implements IMemberApiService {
     this.origin = origin;
   }
 
-  public async get(memberId: string): Promise<DBMember | null> {
+  public async get(): Promise<DBMember | null> {
     try {
-      const res = await fetch(
-        `${this.origin}/api/membership?memberId=${memberId}`
-      );
+      const res = await fetch(`${this.origin}/api/membership`);
 
       if (!res.ok) {
         throw new Error(`Get member failed with status: ${res.status}`);

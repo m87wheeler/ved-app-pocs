@@ -30,7 +30,7 @@ export type MemberDTO = UserDTO & {
 
 export type SessionBridgeDTO = {
   key: string;
-  memberId: number;
+  memberId: string;
   promoId: string;
   expiresAt: number;
 };
@@ -42,8 +42,12 @@ export type DBUser = DBEntry<
   }
 >; // use email as key
 
-export type DBMember = DBEntry<MemberDTO>;
-
 export type DBPromotion = DBEntry<PromotionDTO>;
+
+export type DBMember = DBEntry<
+  MemberDTO & {
+    promotions: DBPromotion[];
+  }
+>;
 
 export type DBSessionBridge = DBEntry<SessionBridgeDTO>; // use key as id
