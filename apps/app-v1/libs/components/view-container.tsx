@@ -35,6 +35,5 @@ export function ViewContainer({
 const $styles = StyleSheet.create({
   view: {
     flex: 1,
-    padding: 8,
   },
 });

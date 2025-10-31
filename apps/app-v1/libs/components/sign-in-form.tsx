@@ -1,89 +1,80 @@
-import { useState } from "react";
-import { StyleSheet, TextInput, View, Button, Text } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import { api } from "../api";
+import { TextInput } from "./text-input";
+import { Button } from "./button";
+import { useMutation } from "@tanstack/react-query";
+import { useForm, useStore } from "@tanstack/react-form";
+import { useRouter } from "expo-router";
+import { useAuthStore } from "../stores/auth-store";
+import { PasswordInput } from "./password-input";
 
-type Props = Readonly<{
-  /**
-   * Callback invoked when the sign-in process starts.
-   */
-  onSubmit?: () => void;
-  /**
-   * Callback invoked upon a successful sign-in.
-   */
-  onSuccess?: () => void;
-  /**
-   * Callback invoked if an error occurs during sign-in.
-   */
-  onError?: (error: Error) => void;
-  /**
-   * Callback invoked when the sign-in process is complete, regardless of outcome.
-   */
-  onComplete?: () => void;
-}>;
+export function SignInForm() {
+  const router = useRouter();
+  const setIsAuthenticated = useAuthStore((state) => state.setIsAuthenticated);
 
-export function SignInForm({
-  onSubmit,
-  onSuccess,
-  onError,
-  onComplete,
-}: Props) {
-  const [email, onEmailChange] = useState("");
-  const [password, onPasswordChange] = useState("");
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  const handleSignIn = async () => {
-    try {
-      if (!email || !password) {
-        throw new Error("Email and password are required.");
+  const { mutateAsync } = useMutation({
+    mutationFn: async (value: { email: string; password: string }) => {
+      const res = await api.auth.signIn(value.email, value.password);
+      if (!res?.success) {
+        throw new Error(res?.error || "Sign-in failed");
       }
+      return res;
+    },
+  });
 
-      setIsSubmitting(true);
-      setError("");
-      onSubmit?.();
+  const form = useForm({
+    defaultValues: { email: "", password: "" },
+    onSubmit: async ({ formApi, value }) => {
+      try {
+        await mutateAsync(value);
+        formApi.reset();
+        setIsAuthenticated(true);
+        router.replace("/");
+      } catch (error) {}
+    },
+  });
 
-      const { success, error } = await api.auth.signIn(email, password);
-      if (!success) {
-        throw new Error(error || "Sign-in failed. Please try again.");
-      }
-
-      onSuccess?.();
-    } catch (error) {
-      const isError = error instanceof Error;
-      setError(isError ? error.message : "An unexpected error occurred.");
-      onError?.(isError ? error : new Error("Unknown error"));
-    } finally {
-      onComplete?.();
-      setIsSubmitting(false);
-    }
-  };
+  const formErrorMap = useStore(form.store, (state) => state.errorMap);
 
   return (
     <View style={$styles.form}>
-      <View style={$styles.formItem}>
-        <TextInput
-          placeholder="Email"
-          keyboardType="email-address"
-          onChangeText={onEmailChange}
-          style={$styles.input}
-        />
-      </View>
-      <View style={$styles.formItem}>
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          onChangeText={onPasswordChange}
-          style={$styles.input}
-        />
-      </View>
-      <Button
-        title={isSubmitting ? "Signing In..." : "Sign In"}
-        onPress={handleSignIn}
+      <form.Field name="email">
+        {(field) => (
+          <View style={$styles.formItem}>
+            <TextInput
+              placeholder="Email"
+              keyboardType="email-address"
+              value={field.state.value}
+              onChangeText={field.handleChange}
+            />
+          </View>
+        )}
+      </form.Field>
+      <form.Field name="password">
+        {(field) => (
+          <View style={$styles.formItem}>
+            <PasswordInput
+              placeholder="Password"
+              value={field.state.value}
+              onChangeText={field.handleChange}
+            />
+          </View>
+        )}
+      </form.Field>
+      <form.Subscribe
+        selector={(state) => [state.isSubmitting]}
+        children={([isSubmitting]) => (
+          <Button
+            title={isSubmitting ? "Signing In..." : "Sign In"}
+            onPress={async () => {
+              void form.handleSubmit();
+            }}
+          />
+        )}
       />
-      {error ? (
+      {formErrorMap.onSubmit ? (
         <View>
-          <Text style={$styles.error}>{error}</Text>
+          <Text style={$styles.error}>{formErrorMap.onSubmit}</Text>
         </View>
       ) : null}
     </View>
